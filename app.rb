@@ -14,6 +14,8 @@ get '/' do
 end
 
 get '/blackjack' do
+
+
   deck = session['deck'] = new_deck.shuffle
   player_cards = session['player_cards'] = deal(deck, 2)
   dealer_cards = session['dealer_cards'] = deal(deck, 2)
@@ -30,7 +32,8 @@ post '/blackjack/hit' do
     redirect('/blackjack/stay')
   else
     erb :blackjack, locals: {player_cards: session['player_cards'],
-                             dealer_cards: session['dealer_cards'].first, wording: nil }
+                             dealer_cards: session['dealer_cards'].first, wording: nil,
+                             bet: session['bet'], purse: session['purse'] }
   end
 end
 
@@ -44,7 +47,8 @@ get '/blackjack/stay' do
   end
   wording = final_result(dealer_cards, session['player_cards'])
   erb :blackjack, locals: {player_cards: session['player_cards'],
-                             dealer_cards: session['dealer_cards'], wording: wording }
+                             dealer_cards: session['dealer_cards'], wording: wording,
+                             bet: session['bet'], purse: session['purse'] }
 
 end
 
