@@ -2,6 +2,7 @@ require 'sinatra'
 require 'pry-byebug'
 require 'sinatra/reloader' if development?
 require './helpers/blackjack_helper.rb'
+require './deck.rb'
 
 enable :sessions
 
@@ -14,11 +15,13 @@ get '/' do
 end
 
 get '/blackjack' do
+  deck = Deck.new
+  
+  session['deck']= deck.cards
 
-
-  deck = session['deck'] = new_deck.shuffle
-  player_cards = session['player_cards'] = deal(deck, 2)
-  dealer_cards = session['dealer_cards'] = deal(deck, 2)
+  
+  player_cards = session['player_cards'] = deal(deck.cards, 2)
+  dealer_cards = session['dealer_cards'] = deal(deck.cards, 2)
 
   erb :blackjack, locals: { player_cards: player_cards,
                             dealer_cards: dealer_cards.first, wording: nil,
@@ -26,7 +29,9 @@ get '/blackjack' do
 end
 
 post '/blackjack/hit' do
-  session['player_cards'] << deal(session['deck'], 1).flatten
+  deck = Deck.new(session['deck'])
+  session['player_cards'] << deal(deck.cards, 1).flatten
+  session['deck'] = deck.cards
   player_cards = session['player_cards']
   if bust?(player_cards)
     redirect('/blackjack/stay')
